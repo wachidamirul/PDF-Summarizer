@@ -1,4 +1,8 @@
-from core.llm_client import call_llm
+from utils.pdf_loader import extract_text
+from utils.text_cleaner import clean_text
 
 if __name__ == '__main__':
-    print(f"{call_llm("hi, siapa kamu?")}")
+    text = clean_text(extract_text("data/pdf/temp.pdf"))
+
+
+    print(f"{text}")
