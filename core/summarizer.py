@@ -8,7 +8,7 @@ def summarize(text):
     1. Baca dan analisis seluruh materi yang diberikan dengan teliti
     2. Identifikasi konsep-konsep kunci, teori utama, dan informasi penting
     3. Organisasikan informasi menjadi poin-poin utama yang logis dan hierarkis
-    4. Gunakan bahasa akademik yang formal, jelas, dan mudah dipahami
+    4. Gunakan bahasa akademik Indonesia yang formal, jelas, dan mudah dipahami
     5. Pastikan setiap poin mencakup esensi dari bagian materi yang relevan
 
     Format Output:
