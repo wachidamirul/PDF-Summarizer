@@ -39,7 +39,7 @@ Berikan output dalam format JSON yang valid dan lengkap berikut ini:
         "C": "Pilihan C",
         "D": "Pilihan D"
       }},
-      "answer": "A"
+      "answer": "A) Pilihan A"
     }}
   ]
 }}

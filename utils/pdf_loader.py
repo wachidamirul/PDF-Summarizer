@@ -3,7 +3,7 @@ import pdfplumber
 
 from config.settings import EXTRACT_PDF_PATH
 
-os.makedirs("data/summaries", exist_ok=True)
+os.makedirs("data/pdf", exist_ok=True)
 
 def extract_text(pdf_path):
     text = ""
