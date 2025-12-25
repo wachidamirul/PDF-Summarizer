@@ -1,13 +1,16 @@
+import os
 import streamlit as st
 
+from config.settings import PDF_PATH, SUMMARIZE_PATH, QUIZ_PATH
+from core.quiz_generator import generate_multiple_choice_quiz, generate_essay_quiz
+from core.summarizer import summarize
 from utils.activity_log import log_activity
 from utils.json_validation import extract_json_block
-from utils.pdf_loader import extract_text
-from utils.text_cleaner import clean_text
-from core.summarizer import summarize
-from core.quiz_generator import generate_quiz
 
-def render_quiz_from_json(quiz_json_str, show_answer=True):
+os.makedirs("data/pdf", exist_ok=True)
+os.makedirs("data/quizzes", exist_ok=True)
+
+def render_multiple_choice_quiz(quiz_json_str, show_answer=True):
     try:
         if isinstance(quiz_json_str, dict):
             data = quiz_json_str
@@ -29,6 +32,25 @@ def render_quiz_from_json(quiz_json_str, show_answer=True):
             if show_answer:
                 st.info(f"✅ Kunci Jawaban: **{item['answer']}**")
 
+            st.markdown("---")
+
+    except Exception as e:
+        st.error("❌ Gagal memproses kuis")
+        st.code(quiz_json_str)
+        st.exception(e)
+
+def render_essay_quiz(quiz_json_str):
+    try:
+        if isinstance(quiz_json_str, dict):
+            data = quiz_json_str
+        else:
+            data = extract_json_block(quiz_json_str)
+
+        quiz_list = data.get("quiz", [])
+
+        for item in quiz_list:
+            st.markdown(f"### {item['number']}) {item['question']}")
+            st.info(f"📝 Jawaban Ideal: {item['answer_key']}")
             st.markdown("---")
 
     except Exception as e:
@@ -65,6 +87,13 @@ def run_ui():
         disabled=disable_input
     )
 
+    quiz_type = st.radio(
+        "Tipe Kuis",
+        ["Pilihan Ganda", "Esai"],
+        horizontal=True,
+        disabled=disable_input
+    )
+
     difficulty = st.selectbox(
         "Tingkat Kesulitan",
         ["Mudah", "Sedang", "Sulit"],
@@ -81,10 +110,8 @@ def run_ui():
     # FILE HANDLING
     # =======================
     if uploaded:
-        with open("data/pdf/temp.pdf", "wb") as f:
+        with open(PDF_PATH, "wb") as f:
             f.write(uploaded.read())
-
-        text = clean_text(extract_text("data/pdf/temp.pdf"))
 
         # =======================
         # STATE: IDLE
@@ -106,18 +133,34 @@ def run_ui():
             try:
                 with st.spinner("📄 Membaca dan meringkas PDF..."):
                     log_activity("PDF diproses")
+                    st.session_state.summary = summarize()
 
-                    st.session_state.summary = summarize(text)
+                    with open(SUMMARIZE_PATH, "w") as f:
+                        f.write(f"{st.session_state.summary}\n")
+                    log_activity("Menyimpan Hasil ringkasan")
+
                     progress.progress(50)
 
                     log_activity("Ringkasan berhasil dibuat")
 
                 with st.spinner("📝 Membuat kuis..."):
-                    st.session_state.quiz = generate_quiz(
-                        st.session_state.summary,
-                        num_questions,
-                        difficulty
-                    )
+                    if quiz_type == "Pilihan Ganda":
+                        st.session_state.quiz = generate_multiple_choice_quiz(
+                            st.session_state.summary,
+                            num_questions,
+                            difficulty
+                        )
+                    else:
+                        st.session_state.quiz = generate_essay_quiz(
+                            st.session_state.summary,
+                            num_questions,
+                            difficulty
+                        )
+
+                    with open(QUIZ_PATH, "w") as f:
+                        f.write(f"{st.session_state.quiz}\n")
+                    log_activity("Menyimpan kuis")
+
                     progress.progress(100)
 
                     log_activity("Kuis berhasil dibuat")
@@ -141,11 +184,13 @@ def run_ui():
             st.write(st.session_state.summary)
 
             st.subheader("📝 Kuis")
-            render_quiz_from_json(
-                st.session_state.quiz,
-                show_answer=True
-            )
-
+            if quiz_type == "Pilihan Ganda":
+                render_multiple_choice_quiz(
+                    st.session_state.quiz,
+                    show_answer=True
+                )
+            else:
+                render_essay_quiz(st.session_state.quiz)
 
             if st.button("🔄 Buat soal lagi"):
                 # RESET TOTAL
