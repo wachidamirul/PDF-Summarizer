@@ -1,12 +1,12 @@
 import streamlit as st
 
-from config.settings import PDF_PATH
-from core.quiz_generator import generate_quiz
+from config.settings import PDF_PATH, SUMMARIZE_PATH
+from core.quiz_generator import generate_multiple_choice_quiz, generate_essay_quiz
 from core.summarizer import summarize
 from utils.activity_log import log_activity
 from utils.json_validation import extract_json_block
 
-def render_quiz_from_json(quiz_json_str, show_answer=True):
+def render_multiple_choice_quiz(quiz_json_str, show_answer=True):
     try:
         if isinstance(quiz_json_str, dict):
             data = quiz_json_str
@@ -35,6 +35,26 @@ def render_quiz_from_json(quiz_json_str, show_answer=True):
         st.code(quiz_json_str)
         st.exception(e)
 
+def render_essay_quiz(quiz_json_str):
+    try:
+        if isinstance(quiz_json_str, dict):
+            data = quiz_json_str
+        else:
+            data = extract_json_block(quiz_json_str)
+
+        quiz_list = data.get("quiz", [])
+
+        for item in quiz_list:
+            st.markdown(f"### {item['number']}) {item['question']}")
+            st.info(f"📝 Jawaban Ideal: {item['answer_key']}")
+            st.markdown("---")
+
+    except Exception as e:
+        st.error("❌ Gagal memproses kuis")
+        st.code(quiz_json_str)
+        st.exception(e)
+
+
 def run_ui():
     st.title("📄 AI Perangkum PDF & Pembuat Kuis")
 
@@ -61,6 +81,13 @@ def run_ui():
     uploaded = st.file_uploader(
         "Upload PDF",
         type="pdf",
+        disabled=disable_input
+    )
+
+    quiz_type = st.radio(
+        "Tipe Kuis",
+        ["Pilihan Ganda", "Esai"],
+        horizontal=True,
         disabled=disable_input
     )
 
@@ -105,16 +132,27 @@ def run_ui():
                     log_activity("PDF diproses")
 
                     st.session_state.summary = summarize()
+
+                    with open(SUMMARIZE_PATH, "w") as f:
+                        f.write(f"{st.session_state.summary}\n")
+                    log_activity("Menyimpan Hasil ringkasan")
                     progress.progress(50)
 
                     log_activity("Ringkasan berhasil dibuat")
 
                 with st.spinner("📝 Membuat kuis..."):
-                    st.session_state.quiz = generate_quiz(
-                        st.session_state.summary,
-                        num_questions,
-                        difficulty
-                    )
+                    if quiz_type == "Pilihan Ganda":
+                        st.session_state.quiz = generate_multiple_choice_quiz(
+                            st.session_state.summary,
+                            num_questions,
+                            difficulty
+                        )
+                    else:
+                        st.session_state.quiz = generate_essay_quiz(
+                            st.session_state.summary,
+                            num_questions,
+                            difficulty
+                        )
                     progress.progress(100)
 
                     log_activity("Kuis berhasil dibuat")
@@ -138,11 +176,13 @@ def run_ui():
             st.write(st.session_state.summary)
 
             st.subheader("📝 Kuis")
-            render_quiz_from_json(
-                st.session_state.quiz,
-                show_answer=True
-            )
-
+            if quiz_type == "Pilihan Ganda":
+                render_multiple_choice_quiz(
+                    st.session_state.quiz,
+                    show_answer=True
+                )
+            else:
+                render_essay_quiz(st.session_state.quiz)
 
             if st.button("🔄 Buat soal lagi"):
                 # RESET TOTAL

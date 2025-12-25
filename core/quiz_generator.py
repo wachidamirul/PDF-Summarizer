@@ -1,6 +1,6 @@
 from core.llm_client import call_llm
 
-def generate_quiz(summary, num_questions, difficulty):
+def generate_multiple_choice_quiz(summary, num_questions, difficulty):
     prompt = f"""
 Anda adalah sistem pembuat soal akademik yang ahli dalam menganalisis konten dan membuat pertanyaan berkualitas tinggi.
 
@@ -51,5 +51,34 @@ INSTRUKSI AKHIR:
 - Output HARUS berupa JSON valid tanpa teks tambahan
 - Periksa kembali struktur JSON sebelum memberikan respons
 - Pastikan semua {num_questions} soal telah dibuat dengan lengkap
+"""
+    return call_llm(prompt)
+
+def generate_essay_quiz(summary, num_questions, difficulty):
+    prompt = f"""
+Anda adalah ahli evaluasi pendidikan.
+
+Buat {num_questions} soal ESAI tingkat {difficulty}
+berdasarkan ringkasan berikut.
+Soal HARUS 100% berasal dari ringkasan.
+
+Ringkasan:
+{summary}
+
+ATURAN:
+- Pertanyaan bersifat terbuka
+- Menguji pemahaman, analisis, atau sintesis
+- Sertakan jawaban ideal singkat
+
+FORMAT OUTPUT (JSON VALID SAJA):
+{{
+  "quiz": [
+    {{
+      "number": 1,
+      "question": "Pertanyaan esai",
+      "answer_key": "Jawaban ideal singkat"
+    }}
+  ]
+}}
 """
     return call_llm(prompt)

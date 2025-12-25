@@ -1,4 +1,3 @@
-from config.settings import SUMMARIZE_PATH
 from core.gemini_client import gemini_client
 
 def summarize():
@@ -28,8 +27,4 @@ Kriteria Kualitas:
 * Akurasi & Kelengkapan: Tidak ada informasi krusial yang terlewat.
 * Kejelasan: Terminologi akademik digunakan dengan tepat dan mudah dipahami.
 """
-    result = gemini_client(prompt)
-    with open(SUMMARIZE_PATH, "w") as f:
-        f.write(f"{result}\n")
-
-    return gemini_client(result)
+    return gemini_client(prompt)
