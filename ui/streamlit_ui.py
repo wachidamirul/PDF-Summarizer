@@ -1,6 +1,6 @@
 import streamlit as st
 
-from config.settings import PDF_PATH
+from config.settings import PDF_PATH, SUMMARIZE_PATH
 from utils.activity_log import log_activity
 from utils.json_validation import extract_json_block
 from utils.pdf_loader import extract_text
@@ -85,8 +85,6 @@ def run_ui():
         with open(PDF_PATH, "wb") as f:
             f.write(uploaded.read())
 
-        text = clean_text(extract_text(PDF_PATH))
-
         # =======================
         # STATE: IDLE
         # =======================
@@ -108,7 +106,7 @@ def run_ui():
                 with st.spinner("📄 Membaca dan meringkas PDF..."):
                     log_activity("PDF diproses")
 
-                    st.session_state.summary = summarize(text)
+                    st.session_state.summary = summarize()
                     progress.progress(50)
 
                     log_activity("Ringkasan berhasil dibuat")

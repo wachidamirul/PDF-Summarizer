@@ -1,6 +1,5 @@
 from config.settings import SUMMARIZE_PATH
 from core.gemini_client import gemini_client
-from core.llm_client import call_llm
 
 def summarize():
     prompt = f"""
