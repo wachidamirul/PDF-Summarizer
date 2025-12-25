@@ -1,12 +1,10 @@
 import streamlit as st
 
-from config.settings import PDF_PATH, SUMMARIZE_PATH
+from config.settings import PDF_PATH
+from core.quiz_generator import generate_quiz
+from core.summarizer import summarize
 from utils.activity_log import log_activity
 from utils.json_validation import extract_json_block
-from utils.pdf_loader import extract_text
-from utils.text_cleaner import clean_text
-from core.summarizer import summarize
-from core.quiz_generator import generate_quiz
 
 def render_quiz_from_json(quiz_json_str, show_answer=True):
     try:

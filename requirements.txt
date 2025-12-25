@@ -2,3 +2,4 @@ streamlit
 pdfplumber
 ollama
 google-genai
+python-dotenv
