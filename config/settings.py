@@ -4,5 +4,9 @@ OLLAMA_MODEL = "gemini-3-flash-preview:cloud"
 OLLAMA_URL = "http://localhost:11434/api/generate"
 OLLAMA_TEMPERATURE = 0.3
 
+GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_KEY = "AIzaSyAMF0V_ZuTtYI9rXdqxDSCLsSYLxEvbdzU"
+
+PDF_PATH = "data/pdf/temp.pdf"
 LOG_PATH = "data/logs/activity.log"
-EXTRACT_PDF_PATH = "data/pdf/temp.txt"
+SUMMARIZE_PATH = "data/pdf/temp.txt"

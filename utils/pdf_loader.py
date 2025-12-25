@@ -1,7 +1,7 @@
 import os
 import pdfplumber
 
-from config.settings import EXTRACT_PDF_PATH
+from config.settings import SUMMARIZE_PATH
 
 os.makedirs("data/pdf", exist_ok=True)
 
@@ -11,7 +11,7 @@ def extract_text(pdf_path):
         for page in pdf.pages:
             text += page.extract_text() + "\n"
 
-    with open(EXTRACT_PDF_PATH, "w") as f:
+    with open(SUMMARIZE_PATH, "w") as f:
         f.write(f"{text}\n")
 
     return text
