@@ -1,10 +1,14 @@
+import os
 import streamlit as st
 
-from config.settings import PDF_PATH, SUMMARIZE_PATH
+from config.settings import PDF_PATH, SUMMARIZE_PATH, QUIZ_PATH
 from core.quiz_generator import generate_multiple_choice_quiz, generate_essay_quiz
 from core.summarizer import summarize
 from utils.activity_log import log_activity
 from utils.json_validation import extract_json_block
+
+os.makedirs("data/pdf", exist_ok=True)
+os.makedirs("data/quizzes", exist_ok=True)
 
 def render_multiple_choice_quiz(quiz_json_str, show_answer=True):
     try:
@@ -53,7 +57,6 @@ def render_essay_quiz(quiz_json_str):
         st.error("❌ Gagal memproses kuis")
         st.code(quiz_json_str)
         st.exception(e)
-
 
 def run_ui():
     st.title("📄 AI Perangkum PDF & Pembuat Kuis")
@@ -130,12 +133,12 @@ def run_ui():
             try:
                 with st.spinner("📄 Membaca dan meringkas PDF..."):
                     log_activity("PDF diproses")
-
                     st.session_state.summary = summarize()
 
                     with open(SUMMARIZE_PATH, "w") as f:
                         f.write(f"{st.session_state.summary}\n")
                     log_activity("Menyimpan Hasil ringkasan")
+
                     progress.progress(50)
 
                     log_activity("Ringkasan berhasil dibuat")
@@ -153,6 +156,11 @@ def run_ui():
                             num_questions,
                             difficulty
                         )
+
+                    with open(QUIZ_PATH, "w") as f:
+                        f.write(f"{st.session_state.quiz}\n")
+                    log_activity("Menyimpan kuis")
+
                     progress.progress(100)
 
                     log_activity("Kuis berhasil dibuat")
