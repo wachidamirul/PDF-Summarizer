@@ -1,4 +1,4 @@
-from core.llm_client import call_llm
+from core.llm_client import llm_quiz
 
 def generate_multiple_choice_quiz(summary, num_questions, difficulty):
     prompt = f"""
@@ -52,7 +52,7 @@ INSTRUKSI AKHIR:
 - Periksa kembali struktur JSON sebelum memberikan respons
 - Pastikan semua {num_questions} soal telah dibuat dengan lengkap
 """
-    return call_llm(prompt)
+    return llm_quiz(prompt)
 
 def generate_essay_quiz(summary, num_questions, difficulty):
     prompt = f"""
@@ -81,4 +81,4 @@ FORMAT OUTPUT (JSON VALID SAJA):
   ]
 }}
 """
-    return call_llm(prompt)
+    return llm_quiz(prompt)
