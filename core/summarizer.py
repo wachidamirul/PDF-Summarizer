@@ -1,4 +1,5 @@
-from core.gemini_client import gemini_client
+from core.llm_client import llm_summarize
+
 
 def summarize():
     prompt = f"""
@@ -27,4 +28,4 @@ Kriteria Kualitas:
 * Akurasi & Kelengkapan: Tidak ada informasi krusial yang terlewat.
 * Kejelasan: Terminologi akademik digunakan dengan tepat dan mudah dipahami.
 """
-    return gemini_client(prompt)
+    return llm_summarize(prompt)
